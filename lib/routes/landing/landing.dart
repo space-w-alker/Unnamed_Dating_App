@@ -12,7 +12,7 @@ class LandingRoute extends StatefulWidget {
 }
 
 class _LandingRouteState extends State<LandingRoute> {
-  int _page_index = 0;
+  int _pageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -26,96 +26,63 @@ class _LandingRouteState extends State<LandingRoute> {
             child: child,
           );
         },
-        child: _getPage(_page_index),
+        child: _getPage(_pageIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
         //type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.supervised_user_circle,
-                //color: Colors.white,
-              ),
-              title: Text(
-                "Match Maker",
-                //style: TextStyle(color: Colors.white),
-              )),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.chat,
-                //color: Colors.white,
-              ),
-              title: Text(
-                "Chat",
-                //style: TextStyle(color: Colors.white),
-              )),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home,
-                //color: Colors.white,
-              ),
-              title: Text(
-                "Home",
-                //style: TextStyle(color: Colors.white),
-              )),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.account_box,
-                //color: Colors.white,
-              ),
-              title: Text(
-                "Update Profile",
-                //style: TextStyle(color: Colors.white),
-              )),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.textsms,
-                //color: Colors.white,
-              ),
-              title: Text(
-                "Flashcards",
-                //style: TextStyle(color: Colors.white),
-              )),
+          _getNavBarItem(iconData: Icons.supervised_user_circle, title: "Match Maker"),
+          _getNavBarItem(iconData: Icons.chat, title: "Chats"),
+          _getNavBarItem(iconData: Icons.home, title: "Home"),
+          _getNavBarItem(iconData: Icons.account_box, title: "Update Profile"),
+          _getNavBarItem(iconData: Icons.announcement, title: "Flashcards"),
         ],
-        currentIndex: _page_index,
-        selectedItemColor: Colors.black,
+        currentIndex: _pageIndex,
+        selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
         backgroundColor: Colors.black,
         onTap: (int index) {
           setState(() {
-            _page_index = index;
+            _pageIndex = index;
           });
         },
       ),
     );
   }
 
-  Widget _getPage(int page_index) {
-    switch (page_index) {
+  Widget _getPage(int pageIndex) {
+    switch (pageIndex) {
       case 0:
-        return MatchMaker(key: ValueKey(page_index));
+        return MatchMaker(key: ValueKey(pageIndex));
         break;
       case 1:
-        return ChatList(key: ValueKey(page_index));
+        return ChatList(key: ValueKey(pageIndex));
         break;
       case 2:
         return Home(
-          key: ValueKey(page_index),
+          key: ValueKey(pageIndex),
         );
         break;
       case 3:
         return ProfileUpdate(
-          key: ValueKey(page_index),
+          key: ValueKey(pageIndex),
         );
         break;
       case 4:
         return FlashcardsPage(
-          key: ValueKey(page_index),
+          key: ValueKey(pageIndex),
         );
         break;
       default:
-        print(page_index);
-        throw Exception("Not Implemented $page_index");
+        print(pageIndex);
+        throw Exception("Not Implemented $pageIndex");
     }
+  }
+
+  BottomNavigationBarItem _getNavBarItem({IconData iconData, String title}) {
+    return BottomNavigationBarItem(
+        icon: Icon(iconData),
+        title: Text(title),
+        backgroundColor: Colors.black);
   }
 }
