@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
+import 'package:provider/provider.dart';
+import 'package:unnameddatingapp/pages/profile_update/profile_update_controller.dart';
 import '../../pages/chat_list/chat_list.dart';
 import '../../pages/flashcards_page/flashcards_page.dart';
 import '../../pages/home/home.dart';
@@ -17,21 +19,26 @@ class _LandingRouteState extends State<LandingRoute> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageTransitionSwitcher(
-        transitionBuilder: (Widget child, Animation<double> primaryAnimation,
-            Animation<double> secondaryAnimation) {
-          return FadeThroughTransition(
-            animation: primaryAnimation,
-            secondaryAnimation: secondaryAnimation,
-            child: child,
-          );
-        },
-        child: _getPage(_pageIndex),
+      body: IndexedStack(
+        index: _pageIndex,
+        children: <Widget>[
+          MatchMaker(key: ValueKey(0)),
+          ChatList(key: ValueKey(1)),
+          Home(key: ValueKey(2)),
+          ChangeNotifierProvider(
+            create: (BuildContext context) {
+              return ProfileUpdateController();
+            },
+            child: ProfileUpdate(key: ValueKey(3)),
+          ),
+          FlashcardsPage(key: ValueKey(4))
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         //type: BottomNavigationBarType.fixed,
         items: <BottomNavigationBarItem>[
-          _getNavBarItem(iconData: Icons.supervised_user_circle, title: "Match Maker"),
+          _getNavBarItem(
+              iconData: Icons.supervised_user_circle, title: "Match Maker"),
           _getNavBarItem(iconData: Icons.chat, title: "Chats"),
           _getNavBarItem(iconData: Icons.home, title: "Home"),
           _getNavBarItem(iconData: Icons.account_box, title: "Update Profile"),
@@ -48,35 +55,6 @@ class _LandingRouteState extends State<LandingRoute> {
         },
       ),
     );
-  }
-
-  Widget _getPage(int pageIndex) {
-    switch (pageIndex) {
-      case 0:
-        return MatchMaker(key: ValueKey(pageIndex));
-        break;
-      case 1:
-        return ChatList(key: ValueKey(pageIndex));
-        break;
-      case 2:
-        return Home(
-          key: ValueKey(pageIndex),
-        );
-        break;
-      case 3:
-        return ProfileUpdate(
-          key: ValueKey(pageIndex),
-        );
-        break;
-      case 4:
-        return FlashcardsPage(
-          key: ValueKey(pageIndex),
-        );
-        break;
-      default:
-        print(pageIndex);
-        throw Exception("Not Implemented $pageIndex");
-    }
   }
 
   BottomNavigationBarItem _getNavBarItem({IconData iconData, String title}) {
