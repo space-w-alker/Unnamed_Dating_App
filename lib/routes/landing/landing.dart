@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:animations/animations.dart';
+import '../../services/authentication.dart';
+import '../../services/firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:unnameddatingapp/pages/profile_update/profile_update_controller.dart';
 import '../../pages/chat_list/chat_list.dart';
@@ -14,10 +16,10 @@ class LandingRoute extends StatefulWidget {
 }
 
 class _LandingRouteState extends State<LandingRoute> {
-  int _pageIndex = 0;
-
+  int _pageIndex = 3;
   @override
   Widget build(BuildContext context) {
+    Authentication.signInAnonym();
     return Scaffold(
       body: IndexedStack(
         index: _pageIndex,

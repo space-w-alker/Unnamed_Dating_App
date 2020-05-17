@@ -21,6 +21,32 @@
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.3/firebase-analytics.js"></script>
+
+  <script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBqevOrADM2pbB2mKRA377oqIPtYWNsVaY",
+    authDomain: "unnamed-dating-app.firebaseapp.com",
+    databaseURL: "https://unnamed-dating-app.firebaseio.com",
+    projectId: "unnamed-dating-app",
+    storageBucket: "unnamed-dating-app.appspot.com",
+    messagingSenderId: "704652295052",
+    appId: "1:704652295052:web:5047ed42e872b640a374a9",
+    measurementId: "G-839SWHC7EY"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+</script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {

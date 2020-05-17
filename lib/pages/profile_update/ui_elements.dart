@@ -3,6 +3,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+import 'package:vector_math/vector_math_64.dart' as vecMath;
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../statics/constants.dart';
 
 typedef void Validator(String value);
 typedef void SetNextFocus(int index, BuildContext context);
@@ -16,9 +19,12 @@ class PageInput extends StatelessWidget {
     this.inputArguments,
   }) : super(key: key);
 
-  void _updateController() {
-    inputArguments.toUpdate[inputArguments.updateKey] =
-        inputArguments.controller.text;
+  void _updateController(String value) {
+    print("Why is this print not showing up");
+    inputArguments.toUpdate.addAll(<String,dynamic>{inputArguments.updateKey:value});
+    print(inputArguments.toUpdate);
+    print(inputArguments.updateKey);
+    print("Printing Updage");
   }
 
   @override
@@ -55,7 +61,7 @@ class PageInput extends StatelessWidget {
                   throw Exception("What Happened");
                 },
                 onChanged: (String value) {
-                  _updateController();
+                  _updateController(value);
                 },
                 decoration: InputDecoration(
                     hintText: inputArguments.hintText,
@@ -100,8 +106,9 @@ class InputArguments {
 class PageInputGroup extends StatelessWidget {
   final String groupName;
   final List<InputArguments> args;
+  final Key key;
 
-  PageInputGroup({this.groupName, this.args});
+  PageInputGroup({@required this.key, this.groupName, this.args}):super(key:key);
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +142,7 @@ class PageInputGroup extends StatelessWidget {
                       style: Theme.of(context).textTheme.headline6,
                     ),
                   ),
-                  PageSwitch()
+                  PageSwitch(toUpdate: args[0].toUpdate,)
                 ],
               )),
           Container(
@@ -190,7 +197,7 @@ class _UserImageState extends State<UserImage>
   void initState() {
     super.initState();
     animationController =
-        AnimationController(duration: Duration(milliseconds: 200), vsync: this);
+        AnimationController(duration: Duration(milliseconds: 300), vsync: this);
   }
 
   @override
@@ -236,35 +243,83 @@ class _UserImageState extends State<UserImage>
             top: -10,
             left: -10,
           ),
+          Positioned(
+            child: Container(
+              height: 60,
+              width: 60,
+              child: Center(
+                child: Text("Something__")
+              ),
+            ),
+            right: -10,
+            top: -10,
+          ),
+          Positioned(
+            child: Container(
+              height: 60,
+              width: 60,
+              child: Center(
+                  child: Text("More++")
+              ),
+            ),
+            right: -10,
+          ),
+          Positioned(
+            child: Container(
+              height: 60,
+              width: 60,
+              child: Center(
+                  child: Text("Something More==")
+              ),
+            ),
+            right: -10,
+            bottom: -10,
+          ),
         ],
       ),
     );
   }
 }
 
-class AttachedIcon extends StatelessWidget {
+class AttachedIcon extends StatefulWidget {
   final Animation<double> animation;
   final IconData iconData;
+  final String svgAsset;
 
-  AttachedIcon({@required this.animation, @required this.iconData});
+  AttachedIcon({@required this.animation, this.iconData, this.svgAsset});
+
+  @override
+  _AttachedIconState createState() => _AttachedIconState();
+}
+
+class _AttachedIconState extends State<AttachedIcon> {
+  Animation<double> myCurve;
+  @override
+  void initState() {
+    super.initState();
+    myCurve = CurvedAnimation(parent: widget.animation, curve: Curves.ease);
+    myCurve.addListener(() {
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-        child: Icon(
-          iconData,
-          size: 30,
-        ),
-      ),
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+      child: widget.svgAsset == null ? Icon(
+        widget.iconData,
+        size: 30,
+      ) : SvgPicture.asset(widget.svgAsset),
     );
   }
 }
 
 class PageSwitch extends StatefulWidget {
+  final Map<String, dynamic> toUpdate;
+
+  PageSwitch({this.toUpdate});
+
   @override
   _PageSwitchState createState() => _PageSwitchState();
 }
@@ -279,30 +334,11 @@ class _PageSwitchState extends State<PageSwitch>
   void initState() {
     super.initState();
     isOn = false;
+    widget.toUpdate[SHOW_CARD] = isOn;
     animController =
         AnimationController(duration: Duration(milliseconds: 200), vsync: this);
     animation =
-        CurvedAnimation(parent: animController, curve: Curves.easeOutCirc);
-    animation.addStatusListener((status) {
-      switch (status) {
-        case AnimationStatus.dismissed:
-          setState(() {
-            isOn = false;
-          });
-          break;
-        case AnimationStatus.forward:
-          // TODO: Handle this case.
-          break;
-        case AnimationStatus.reverse:
-          // TODO: Handle this case.
-          break;
-        case AnimationStatus.completed:
-          isOn = true;
-          break;
-        default:
-          break;
-      }
-    });
+        CurvedAnimation(parent: animController, curve: Curves.ease);
     animation.addListener(() {
       setState(() {});
     });
@@ -312,7 +348,15 @@ class _PageSwitchState extends State<PageSwitch>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        isOn ? animController.reverse() : animController.forward();
+        if(isOn){
+          isOn = false;
+          animController.reverse();
+        }
+        else{
+          isOn = true;
+          animController.forward();
+        }
+        widget.toUpdate[SHOW_CARD] = isOn;
       },
       child: Container(
         margin: EdgeInsets.all(4),
@@ -321,6 +365,52 @@ class _PageSwitchState extends State<PageSwitch>
         child: CustomPaint(
           painter: SwitchBorderPainter(isOn: isOn, pos: animation.value),
         ),
+      ),
+    );
+  }
+}
+
+class PageFloatingButton extends StatefulWidget {
+  final String text;
+  final Function onPressed;
+
+  PageFloatingButton({this.text, this.onPressed});
+
+  @override
+  _PageFloatingButtonState createState() => _PageFloatingButtonState();
+}
+
+class _PageFloatingButtonState extends State<PageFloatingButton> {
+  bool isPressed = false;
+  BoxShadow downShadow = BoxShadow(color: Colors.black45, blurRadius: 1);
+  BoxShadow upShadow = BoxShadow(color: Colors.black45, blurRadius: 5);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (tap){
+        setState(() {
+          isPressed = true;
+        });
+      },
+      onTapUp: (tap){
+        setState(() {
+          isPressed = false;
+        });
+      },
+      onTapCancel: (){
+        setState(() {
+          isPressed = false;
+        });
+      },
+      onTap: (){
+        widget.onPressed();
+      },
+      child: AnimatedContainer(
+        duration: Duration(microseconds: 1000),
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        decoration: BoxDecoration(boxShadow: <BoxShadow>[isPressed ? downShadow : upShadow], borderRadius: BorderRadius.circular(75), color: Theme.of(context).primaryColor),
+        child: Text(widget.text, style: Theme.of(context).textTheme.button,),
       ),
     );
   }
