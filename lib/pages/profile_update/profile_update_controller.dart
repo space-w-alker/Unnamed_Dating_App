@@ -21,12 +21,12 @@ class ProfileUpdateController extends ChangeNotifier {
 
   void updateProfile(FirebaseUser user){
     Firestore store = AppDatabase.getFireStoreInstance();
-    print("Printing Personal Info");
-    print(personal_info);
-    store.collection("users").document(user.uid).collection(PROFILE).document(PERSONAL_PROFILE).updateData(personal_info);
-    store.collection("users").document(user.uid).collection(PROFILE).document(MUSIC_TASTE).updateData(music_taste);
-    store.collection("users").document(user.uid).collection(PROFILE).document(MOVIES).updateData(movies);
-    store.collection("users").document(user.uid).collection(PROFILE).document(TECH_LIFE).updateData(tech_life);
-    store.collection("users").document(user.uid).collection(PROFILE).document(EXTRAS).updateData(extras);
+    WriteBatch batch = store.batch();
+    batch.updateData(store.collection("users").document(user.uid).collection(PROFILE).document(PERSONAL_PROFILE), personal_info);
+    batch.updateData(store.collection("users").document(user.uid).collection(PROFILE).document(MUSIC_TASTE), music_taste);
+    batch.updateData(store.collection("users").document(user.uid).collection(PROFILE).document(MOVIES), movies);
+    batch.updateData(store.collection("users").document(user.uid).collection(PROFILE).document(TECH_LIFE), tech_life);
+    batch.updateData(store.collection("users").document(user.uid).collection(PROFILE).document(EXTRAS), extras);
+    batch.commit();
   }
 }

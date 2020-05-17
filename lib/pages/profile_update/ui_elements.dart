@@ -21,7 +21,8 @@ class PageInput extends StatelessWidget {
 
   void _updateController(String value) {
     print("Why is this print not showing up");
-    inputArguments.toUpdate.addAll(<String,dynamic>{inputArguments.updateKey:value});
+    inputArguments.toUpdate
+        .addAll(<String, dynamic>{inputArguments.updateKey: value});
     print(inputArguments.toUpdate);
     print(inputArguments.updateKey);
     print("Printing Updage");
@@ -108,7 +109,8 @@ class PageInputGroup extends StatelessWidget {
   final List<InputArguments> args;
   final Key key;
 
-  PageInputGroup({@required this.key, this.groupName, this.args}):super(key:key);
+  PageInputGroup({@required this.key, this.groupName, this.args})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +144,9 @@ class PageInputGroup extends StatelessWidget {
                       style: Theme.of(context).textTheme.headline6,
                     ),
                   ),
-                  PageSwitch(toUpdate: args[0].toUpdate,)
+                  PageSwitch(
+                    toUpdate: args[0].toUpdate,
+                  )
                 ],
               )),
           Container(
@@ -197,7 +201,7 @@ class _UserImageState extends State<UserImage>
   void initState() {
     super.initState();
     animationController =
-        AnimationController(duration: Duration(milliseconds: 300), vsync: this);
+        AnimationController(duration: Duration(milliseconds: 200), vsync: this);
   }
 
   @override
@@ -216,10 +220,12 @@ class _UserImageState extends State<UserImage>
         children: <Widget>[
           Icon(
             Icons.account_circle,
+            key: ValueKey(0),
             size: 150,
             color: Colors.white,
           ),
           Positioned(
+            key: ValueKey(1),
             child: Container(
               height: 60,
               width: 60,
@@ -232,6 +238,7 @@ class _UserImageState extends State<UserImage>
             left: -10,
           ),
           Positioned(
+            key: ValueKey(2),
             child: Container(
               height: 60,
               width: 60,
@@ -244,33 +251,31 @@ class _UserImageState extends State<UserImage>
             left: -10,
           ),
           Positioned(
+            key: ValueKey(3),
             child: Container(
               height: 60,
               width: 60,
-              child: Center(
-                child: Text("Something__")
-              ),
+              child: Center(child: AttachedIcon(animation: animationController, iconAssetPath: "assets/icons/icons8-google.png",)),
             ),
             right: -10,
             top: -10,
           ),
           Positioned(
+            key: ValueKey(4),
             child: Container(
               height: 60,
               width: 60,
-              child: Center(
-                  child: Text("More++")
-              ),
+              child: Center(child: AttachedIcon(animation: animationController, iconAssetPath: "assets/icons/icons8-facebook.png",)),
             ),
-            right: -10,
+            right: -40,
+            top: 45,
           ),
           Positioned(
+            key: ValueKey(5),
             child: Container(
               height: 60,
               width: 60,
-              child: Center(
-                  child: Text("Something More==")
-              ),
+              child: Center(child: AttachedIcon(animation: animationController, iconAssetPath: "assets/icons/icons8-apple-logo.png",)),
             ),
             right: -10,
             bottom: -10,
@@ -284,9 +289,9 @@ class _UserImageState extends State<UserImage>
 class AttachedIcon extends StatefulWidget {
   final Animation<double> animation;
   final IconData iconData;
-  final String svgAsset;
+  final String iconAssetPath;
 
-  AttachedIcon({@required this.animation, this.iconData, this.svgAsset});
+  AttachedIcon({@required this.animation, this.iconData, this.iconAssetPath});
 
   @override
   _AttachedIconState createState() => _AttachedIconState();
@@ -297,20 +302,31 @@ class _AttachedIconState extends State<AttachedIcon> {
   @override
   void initState() {
     super.initState();
-    myCurve = CurvedAnimation(parent: widget.animation, curve: Curves.ease);
+    myCurve = CurvedAnimation(parent: widget.animation, curve: Curves.easeInCirc);
     myCurve.addListener(() {
+      setState(() {
+        
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-      child: widget.svgAsset == null ? Icon(
-        widget.iconData,
-        size: 30,
-      ) : SvgPicture.asset(widget.svgAsset),
+    Matrix4 scale = Matrix4.compose(vecMath.Vector3.zero(),
+        vecMath.Quaternion.euler(0, 0, 0), vecMath.Vector3.all(1) * myCurve.value);
+    return Transform(
+      transform: scale,
+      origin: Offset(30, 30),
+      child: Container(
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, boxShadow: <BoxShadow>[BoxShadow(color: Colors.black, blurRadius: 5)]),
+        child: widget.iconAssetPath == null
+            ? Icon(
+                widget.iconData,
+                size: 30,
+              )
+            : Image.asset(widget.iconAssetPath, height: 30, width: 30,),
+      ),
     );
   }
 }
@@ -337,8 +353,7 @@ class _PageSwitchState extends State<PageSwitch>
     widget.toUpdate[SHOW_CARD] = isOn;
     animController =
         AnimationController(duration: Duration(milliseconds: 200), vsync: this);
-    animation =
-        CurvedAnimation(parent: animController, curve: Curves.ease);
+    animation = CurvedAnimation(parent: animController, curve: Curves.ease);
     animation.addListener(() {
       setState(() {});
     });
@@ -348,11 +363,10 @@ class _PageSwitchState extends State<PageSwitch>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if(isOn){
+        if (isOn) {
           isOn = false;
           animController.reverse();
-        }
-        else{
+        } else {
           isOn = true;
           animController.forward();
         }
@@ -388,29 +402,35 @@ class _PageFloatingButtonState extends State<PageFloatingButton> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (tap){
+      onTapDown: (tap) {
         setState(() {
           isPressed = true;
         });
       },
-      onTapUp: (tap){
+      onTapUp: (tap) {
         setState(() {
           isPressed = false;
         });
       },
-      onTapCancel: (){
+      onTapCancel: () {
         setState(() {
           isPressed = false;
         });
       },
-      onTap: (){
+      onTap: () {
         widget.onPressed();
       },
       child: AnimatedContainer(
         duration: Duration(microseconds: 1000),
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-        decoration: BoxDecoration(boxShadow: <BoxShadow>[isPressed ? downShadow : upShadow], borderRadius: BorderRadius.circular(75), color: Theme.of(context).primaryColor),
-        child: Text(widget.text, style: Theme.of(context).textTheme.button,),
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+        decoration: BoxDecoration(
+            boxShadow: <BoxShadow>[isPressed ? downShadow : upShadow],
+            borderRadius: BorderRadius.circular(75),
+            color: Theme.of(context).primaryColor),
+        child: Text(
+          widget.text,
+          style: Theme.of(context).textTheme.button,
+        ),
       ),
     );
   }
@@ -485,6 +505,7 @@ class UserBannerBackgroundPaint extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..color = Theme.of(context).primaryColor
+      ..isAntiAlias = true
       ..style = PaintingStyle.fill;
     Path path = new Path()
       ..lineTo(0, 6 / 10 * size.height)

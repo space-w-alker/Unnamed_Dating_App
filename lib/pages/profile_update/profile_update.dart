@@ -71,8 +71,8 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
               Provider.of<ProfileUpdateController>(context, listen: false).updateProfile(user);
             },
           ),
-          bottom: 24,
-          right: 24,
+          bottom: 8,
+          right: 8,
         )
       ],
     );

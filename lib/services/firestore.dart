@@ -21,36 +21,20 @@ class AppDatabase {
       print(e);
     }
     if (documentSnapshot.exists) return;
-    store.collection("users").document(user.uid).setData(<String,dynamic>{"created":FieldValue.serverTimestamp()});
-    store
-        .collection("users")
-        .document(user.uid)
-        .collection(PROFILE)
-        .document(PERSONAL_PROFILE)
-        .setData(<String, dynamic>{"created": FieldValue.serverTimestamp()});
-    store
-        .collection("users")
-        .document(user.uid)
-        .collection(PROFILE)
-        .document(MUSIC_TASTE)
-        .setData(<String, dynamic>{"created": FieldValue.serverTimestamp()});
-    store
-        .collection("users")
-        .document(user.uid)
-        .collection(PROFILE)
-        .document(MOVIES)
-        .setData(<String, dynamic>{"created": FieldValue.serverTimestamp()});
-    store
-        .collection("users")
-        .document(user.uid)
-        .collection(PROFILE)
-        .document(TECH_LIFE)
-        .setData(<String, dynamic>{"created": FieldValue.serverTimestamp()});
-    store
-        .collection("users")
-        .document(user.uid)
-        .collection(PROFILE)
-        .document(EXTRAS)
-        .setData(<String, dynamic>{"created": FieldValue.serverTimestamp()});
+    WriteBatch batch = store.batch();
+    DocumentReference uiDocRef = store.collection("users").document(user.uid);
+    DocumentReference personalProfileRef = store.collection("users").document(user.uid).collection(PROFILE).document(PERSONAL_PROFILE);
+    DocumentReference musicTasteRef = store.collection("users").document(user.uid).collection(PROFILE).document(MUSIC_TASTE);
+    DocumentReference moviesRef = store.collection("users").document(user.uid).collection(PROFILE).document(MOVIES);
+    DocumentReference techLifeRef = store.collection("users").document(user.uid).collection(PROFILE).document(TECH_LIFE);
+    DocumentReference extrasRef = store.collection("users").document(user.uid).collection(PROFILE).document(EXTRAS);
+
+    batch.setData(uiDocRef, <String,dynamic>{"created":FieldValue.serverTimestamp()});
+    batch.setData(personalProfileRef, <String,dynamic>{"created":FieldValue.serverTimestamp()});
+    batch.setData(musicTasteRef, <String,dynamic>{"created":FieldValue.serverTimestamp()});
+    batch.setData(moviesRef, <String,dynamic>{"created":FieldValue.serverTimestamp()});
+    batch.setData(techLifeRef, <String,dynamic>{"created":FieldValue.serverTimestamp()});
+    batch.setData(extrasRef, <String,dynamic>{"created":FieldValue.serverTimestamp()});
+    batch.commit();
   }
 }
