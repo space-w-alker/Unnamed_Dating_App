@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "704652295052",
+    "firebase_url": "https://unnamed-dating-app.firebaseio.com",
+    "project_id": "unnamed-dating-app",
+    "storage_bucket": "unnamed-dating-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:704652295052:android:da4f7dde98557f09a374a9",
+        "android_client_info": {
+          "package_name": "com.divrtechstudios.unnameddatingapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "704652295052-sjmeii4s5letothvhdj290bf5ssir07h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7XaLqg5iFgh2ny1BALxZHbr5itlJbpdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "704652295052-sjmeii4s5letothvhdj290bf5ssir07h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
