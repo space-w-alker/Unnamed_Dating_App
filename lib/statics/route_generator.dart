@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../routes/landing/landing.dart';
-import '../routes/profile_display/profile_display.dart';
+
 
 class RouteGenerator{
   static Route<dynamic> routegenerator(RouteSettings settings){

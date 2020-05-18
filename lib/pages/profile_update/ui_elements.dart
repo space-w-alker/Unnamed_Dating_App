@@ -1,11 +1,13 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:vector_math/vector_math_64.dart' as vecMath;
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../statics/constants.dart';
+import '../../services/authentication.dart';
 
 typedef void Validator(String value);
 typedef void SetNextFocus(int index, BuildContext context);
@@ -55,7 +57,7 @@ class PageInput extends StatelessWidget {
                     ? TextInputAction.done
                     : TextInputAction.next,
                 onFieldSubmitted: (value) {
-                  throw Exception("What Happened");
+                  //throw Exception("What Happened");
                   inputArguments.setNextFocus(inputArguments.index, context);
                 },
                 onEditingComplete: () {
@@ -122,7 +124,8 @@ class PageInputGroup extends StatelessWidget {
         children: <Widget>[
           Container(
               decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
+                  // color: Theme.of(context).primaryColor,
+                  gradient: LinearGradient(colors: <Color>[Theme.of(context).primaryColorDark, Theme.of(context).primaryColor],),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
                         color: Colors.black45,
@@ -255,7 +258,17 @@ class _UserImageState extends State<UserImage>
             child: Container(
               height: 60,
               width: 60,
-              child: Center(child: AttachedIcon(animation: animationController, iconAssetPath: "assets/icons/icons8-google.png",)),
+              child: Center(
+                  child: AttachedIcon(
+                animation: animationController,
+                iconAssetPath: "assets/icons/icons8-google.png",
+                onPressed: (){
+                  Authentication.linkWithGoogle().catchError((error){
+                    //TODO: Handle network errors;
+                    //TODO: Handle User exists error;
+                  });
+                },
+              )),
             ),
             right: -10,
             top: -10,
@@ -265,7 +278,11 @@ class _UserImageState extends State<UserImage>
             child: Container(
               height: 60,
               width: 60,
-              child: Center(child: AttachedIcon(animation: animationController, iconAssetPath: "assets/icons/icons8-facebook.png",)),
+              child: Center(
+                  child: AttachedIcon(
+                animation: animationController,
+                iconAssetPath: "assets/icons/icons8-facebook.png",
+              )),
             ),
             right: -40,
             top: 45,
@@ -275,7 +292,11 @@ class _UserImageState extends State<UserImage>
             child: Container(
               height: 60,
               width: 60,
-              child: Center(child: AttachedIcon(animation: animationController, iconAssetPath: "assets/icons/icons8-apple-logo.png",)),
+              child: Center(
+                  child: AttachedIcon(
+                animation: animationController,
+                iconAssetPath: "assets/icons/icons8-apple-logo.png",
+              )),
             ),
             right: -10,
             bottom: -10,
@@ -290,8 +311,13 @@ class AttachedIcon extends StatefulWidget {
   final Animation<double> animation;
   final IconData iconData;
   final String iconAssetPath;
+  final Function onPressed;
 
-  AttachedIcon({@required this.animation, this.iconData, this.iconAssetPath});
+  AttachedIcon(
+      {@required this.animation,
+      this.iconData,
+      this.iconAssetPath,
+      this.onPressed});
 
   @override
   _AttachedIconState createState() => _AttachedIconState();
@@ -302,30 +328,43 @@ class _AttachedIconState extends State<AttachedIcon> {
   @override
   void initState() {
     super.initState();
-    myCurve = CurvedAnimation(parent: widget.animation, curve: Curves.easeInCirc);
+    myCurve =
+        CurvedAnimation(parent: widget.animation, curve: Curves.easeInCirc);
     myCurve.addListener(() {
-      setState(() {
-        
-      });
+      setState(() {});
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Matrix4 scale = Matrix4.compose(vecMath.Vector3.zero(),
-        vecMath.Quaternion.euler(0, 0, 0), vecMath.Vector3.all(1) * myCurve.value);
+    Matrix4 scale = Matrix4.compose(
+        vecMath.Vector3.zero(),
+        vecMath.Quaternion.euler(0, 0, 0),
+        vecMath.Vector3.all(1) * myCurve.value);
     return Transform(
       transform: scale,
       origin: Offset(30, 30),
-      child: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white, boxShadow: <BoxShadow>[BoxShadow(color: Colors.black, blurRadius: 5)]),
-        child: widget.iconAssetPath == null
-            ? Icon(
-                widget.iconData,
-                size: 30,
-              )
-            : Image.asset(widget.iconAssetPath, height: 30, width: 30,),
+      child: GestureDetector(
+        onTap: widget.onPressed,
+        child: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              boxShadow: <BoxShadow>[
+                BoxShadow(color: Colors.black, blurRadius: 5)
+              ]),
+          child: widget.iconAssetPath == null
+              ? Icon(
+                  widget.iconData,
+                  size: 30,
+                )
+              : Image.asset(
+                  widget.iconAssetPath,
+                  height: 30,
+                  width: 30,
+                ),
+        ),
       ),
     );
   }

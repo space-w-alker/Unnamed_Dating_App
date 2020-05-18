@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:provider/provider.dart';
 import 'package:unnameddatingapp/pages/profile_update/profile_update_controller.dart';
 import 'ui_elements.dart';
@@ -23,7 +22,9 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<FirebaseUser>(context, listen: true);
-    AppDatabase.createProfile(user);
+    AppDatabase.createProfile(user).catchError((error){
+      //TODO: Handle profile creation network errors;
+    });
     args = _getInputArguments(context);
     return Stack(
       children: [
@@ -83,98 +84,98 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
       InputArguments(
           index: 0,
           hintText: "Name",
-          toUpdate: Provider.of<ProfileUpdateController>(context).personal_info,
+          toUpdate: Provider.of<ProfileUpdateController>(context).personalInfoMap,
           updateKey: USER_NAME_FIELD,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 1,
           hintText: "Job",
-          toUpdate: Provider.of<ProfileUpdateController>(context).personal_info,
+          toUpdate: Provider.of<ProfileUpdateController>(context).personalInfoMap,
           updateKey: USER_JOB_FIELD,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 2,
           hintText: "Date Of Birth",
-          toUpdate: Provider.of<ProfileUpdateController>(context).personal_info,
+          toUpdate: Provider.of<ProfileUpdateController>(context).personalInfoMap,
           updateKey: USER_DATE_OF_BIRTH,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 3,
           hintText: "Height",
-          toUpdate: Provider.of<ProfileUpdateController>(context).personal_info,
+          toUpdate: Provider.of<ProfileUpdateController>(context).personalInfoMap,
           updateKey: USER_HEIGHT,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 4,
           hintText: "To All",
           helperText: "Say a few choice words to anyone viewing your profile",
-          toUpdate: Provider.of<ProfileUpdateController>(context).personal_info,
+          toUpdate: Provider.of<ProfileUpdateController>(context).personalInfoMap,
           updateKey: USER_TO_ALL,
-          setNextFocus: FocusNext,
+          setNextFocus: focusNextInput,
           isLast: true),
       InputArguments(
           index: 5,
           hintText: "Music #1",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
-              .music_taste,
+              .musicTasteMap,
           updateKey: MU_1,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 6,
           hintText: "Music #2",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
-              .music_taste,
+              .musicTasteMap,
           updateKey: MU_2,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 7,
           hintText: "Music #3",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
-              .music_taste,
+              .musicTasteMap,
           updateKey: MU_3,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 8,
           hintText: "Movie #1",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
               .movies,
           updateKey: MO_1,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 9,
           hintText: "Movie #2",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
               .movies,
           updateKey: MO_2,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 10,
           hintText: "Movie #3",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
               .movies,
           updateKey: MO_3,
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 11,
           hintText: "OS of Choice",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
-              .tech_life,
+              .techLifeMap,
           updateKey: OS_OF_CHOICE,
           helperText: "Chose your camp. Windows, Mac or Linux",
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 12,
           hintText: "Phone of Choice",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
-              .tech_life,
+              .techLifeMap,
           updateKey: PHONE_OF_CHOICE,
           helperText: "Andorid or iOS",
-          setNextFocus: FocusNext),
+          setNextFocus: focusNextInput),
       InputArguments(
           index: 13,
           hintText: "Gaming Platform",
           toUpdate: Provider.of<ProfileUpdateController>(context, listen: false)
-              .tech_life,
+              .techLifeMap,
           updateKey: GAME_PLATFORM,
           helperText: "Where do you play?"),
       InputArguments(
@@ -204,7 +205,7 @@ class _ProfileUpdateState extends State<ProfileUpdate> {
     ];
   }
 
-  void FocusNext(int index, BuildContext context) {
+  void focusNextInput(int index, BuildContext context) {
     args[index].focusNode.unfocus();
     FocusScope.of(context).requestFocus(args[index + 1].focusNode);
   }

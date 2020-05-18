@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "704652295052-6ujs9qjndkeo4pfkp26msna6stbfups8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.divrtechstudios.unnameddatingapp",
+            "certificate_hash": "a17387530da830c7962673a8b9c7dd2e33d4334e"
+          }
+        },
+        {
           "client_id": "704652295052-sjmeii4s5letothvhdj290bf5ssir07h.apps.googleusercontent.com",
           "client_type": 3
         }
