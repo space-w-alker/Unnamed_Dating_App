@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:unnameddatingapp/services/firestore.dart';
 
 class Authentication {
   static FirebaseAuth _auth = FirebaseAuth.instance;
@@ -25,13 +27,28 @@ class Authentication {
       accessToken: googleSignInAuthentication.accessToken,
       idToken: googleSignInAuthentication.idToken,
     );
-
-    await _auth
-        .currentUser()
-        .then((value) => value.linkWithCredential(credential));
+    FirebaseUser currUser = await _auth.currentUser();
+    try {
+      await currUser.linkWithCredential(credential);
+    } on PlatformException catch (error) {
+      if (error.code == "ERROR_CREDENTIAL_ALREADY_IN_USE") {
+        await deleteUser(currUser);
+        await _auth.signInWithCredential(credential);
+      } else {
+        rethrow;
+      }
+    }
   }
 
-  void signOutGoogle() async {
+  static Future signOutGoogle() async {
     await googleSignIn.signOut();
+  }
+
+  static Future deleteUser(FirebaseUser currUser) async {
+    await AppDatabase.getFireStoreInstance()
+        .collection("users")
+        .document(currUser.uid)
+        .delete();
+    await currUser.delete();
   }
 }

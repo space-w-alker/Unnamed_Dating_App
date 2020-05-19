@@ -265,7 +265,6 @@ class _UserImageState extends State<UserImage>
                 onPressed: (){
                   Authentication.linkWithGoogle().catchError((error){
                     //TODO: Handle network errors;
-                    //TODO: Handle User exists error;
                   });
                 },
               )),
