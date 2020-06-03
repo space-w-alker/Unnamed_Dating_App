@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:unnameddatingapp/services/firestore.dart';
 import '../../services/authentication.dart';
 import 'package:provider/provider.dart';
 import 'package:unnameddatingapp/pages/profile_update/profile_update_controller.dart';
@@ -19,13 +21,22 @@ class _LandingRouteState extends State<LandingRoute> {
   @override
   void initState() {
     super.initState();
-    Authentication.signInAnonym();
     _pageIndex = 3;
   }
 
   @override
   Widget build(BuildContext context) {
-    
+    FirebaseUser user = Provider.of<FirebaseUser>(context, listen: true);
+    Authentication.getInstance().currentUser().then((FirebaseUser value) {
+      if (value == null) {
+        print("Signing in anoymously");
+        Authentication.signInAnonym();
+      }
+    });
+    AppDatabase.createProfile(user).catchError((error) {
+      //TODO: Handle profile creation network errors;
+    });
+
     return Scaffold(
       body: IndexedStack(
         index: _pageIndex,
@@ -37,7 +48,9 @@ class _LandingRouteState extends State<LandingRoute> {
             create: (BuildContext context) {
               return ProfileUpdateController();
             },
-            child: ProfileUpdate(key: ValueKey(3)),
+            child: ProfileUpdate(
+              user: user,
+            ),
           ),
           FlashcardsPage(key: ValueKey(4))
         ],

@@ -1,10 +1,16 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
+import 'package:unnameddatingapp/global_ui_elements/loading_view.dart';
+import 'package:unnameddatingapp/pages/profile_update/profile_update_controller.dart';
+import 'package:unnameddatingapp/services/firestore.dart';
 import 'package:vector_math/vector_math_64.dart' as vecMath;
 import '../../statics/constants.dart';
 import '../../services/authentication.dart';
@@ -125,7 +131,12 @@ class PageInputGroup extends StatelessWidget {
           Container(
               decoration: BoxDecoration(
                   // color: Theme.of(context).primaryColor,
-                  gradient: LinearGradient(colors: <Color>[Theme.of(context).primaryColorDark, Theme.of(context).primaryColor],),
+                  gradient: LinearGradient(
+                    colors: <Color>[
+                      Theme.of(context).primaryColorDark,
+                      Theme.of(context).primaryColor
+                    ],
+                  ),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
                         color: Colors.black45,
@@ -176,6 +187,10 @@ class PageInputGroup extends StatelessWidget {
 }
 
 class UserBanner extends StatelessWidget {
+  final FirebaseUser user;
+
+  UserBanner({this.user});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -184,7 +199,8 @@ class UserBanner extends StatelessWidget {
       child: CustomPaint(
         painter: UserBannerBackgroundPaint(context: context),
         child: Center(
-          child: Container(padding: EdgeInsets.all(10), child: UserImage()),
+          child: Container(
+              padding: EdgeInsets.all(10), child: UserImage(user: user)),
         ),
       ),
     );
@@ -192,6 +208,10 @@ class UserBanner extends StatelessWidget {
 }
 
 class UserImage extends StatefulWidget {
+  final FirebaseUser user;
+
+  UserImage({this.user});
+
   @override
   _UserImageState createState() => _UserImageState();
 }
@@ -199,12 +219,26 @@ class UserImage extends StatefulWidget {
 class _UserImageState extends State<UserImage>
     with SingleTickerProviderStateMixin {
   AnimationController animationController;
+  String imageUrl;
 
   @override
   void initState() {
     super.initState();
     animationController =
         AnimationController(duration: Duration(milliseconds: 200), vsync: this);
+    imageUrl = "";
+    AppDatabase.getFireStoreInstance()
+        .collection("users")
+        .document(widget.user.uid)
+        .collection(PROFILE)
+        .document(PERSONAL_PROFILE)
+        .snapshots()
+        .listen((doc) {
+      setState(() {
+        imageUrl = doc.data[IMAGE_URL];
+        print(doc.data[IMAGE_URL]);
+      });
+    });
   }
 
   @override
@@ -221,11 +255,23 @@ class _UserImageState extends State<UserImage>
       child: Stack(
         overflow: Overflow.visible,
         children: <Widget>[
-          Icon(
-            Icons.account_circle,
-            key: ValueKey(0),
-            size: 150,
-            color: Colors.white,
+          Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle
+            ),
+            child: CachedNetworkImage(
+              fit: BoxFit.fitWidth,
+              imageUrl: imageUrl,
+              height: 160,
+              width: 160,
+              placeholder: (context, url) {
+                return WidgetLoading();
+              },
+              errorWidget: (context, url, error){
+                return Icon(Icons.account_circle, size: 160,);
+              },
+            ),
           ),
           Positioned(
             key: ValueKey(1),
@@ -262,9 +308,16 @@ class _UserImageState extends State<UserImage>
                   child: AttachedIcon(
                 animation: animationController,
                 iconAssetPath: "assets/icons/icons8-google.png",
-                onPressed: (){
-                  Authentication.linkWithGoogle().catchError((error){
-                    //TODO: Handle network errors;
+                onPressed: () {
+                  Authentication.linkWithGoogle(
+                          mapInfo: Provider.of<ProfileUpdateController>(context,
+                                  listen: false)
+                              .personalInfoMap)
+                      .then((value) {
+                    Provider.of<ProfileUpdateController>(context, listen: false)
+                        .updateProfile(widget.user);
+                  }, onError: (error) {
+                    //TODO: Handle network errors
                   });
                 },
               )),
@@ -543,7 +596,6 @@ class UserBannerBackgroundPaint extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
       ..color = Theme.of(context).primaryColor
-      ..isAntiAlias = true
       ..style = PaintingStyle.fill;
     Path path = new Path()
       ..lineTo(0, 6 / 10 * size.height)
